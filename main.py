@@ -16,10 +16,13 @@ def refactor_data_set(_cars):
     _cars = _cars.drop('city', axis=1)
     _cars = _cars.drop('id', axis=1)
     _cars = _cars.drop('fuel', axis=1)
+    # zlot to euro conversion
+    _cars['price'] = _cars["price"] * 0.22
     # cars = cars.drop('mark', axis=1)
     # cars = cars.drop('model', axis=1)
     _cars = _cars.drop('generation_name', axis=1)
     return _cars
+
 
 # get variables that are used for training
 def train_variables(cars):
@@ -48,6 +51,7 @@ def create_train_model(_cars):
     model_dummies = pd.get_dummies(_cars.model)
     _cars = _cars.join(model_dummies)
     _cars = _cars.drop('model', axis=1)
+    # change nr of iterations
     model = CatBoostRegressor(iterations=6542, learning_rate=0.03)
     return model, _cars
 
@@ -65,34 +69,47 @@ def bar_chart(_model, _cars):
 
 def predict_price(_model, _cars):
     real_data = pd.DataFrame.from_records(_cars)
+    listing_price = real_data['price']
     real_data = real_data.drop('price', axis=1)
     real_data['age'] = datetime.datetime.now().year - real_data['year']
+    # remove year from prediction as we have age
     real_data = real_data.drop('year', axis=1)
 
     fit_model = pd.DataFrame(columns=cars.columns)
     fit_model = fit_model.append(real_data, ignore_index=True)
     fit_model = fit_model.fillna(0)
-
-    # change nr of iterations
     prediction = _model.predict(fit_model)
-    print(prediction)
-    print(real_data)
+    print('--------------------------- \n')
+    print('prediction result \n',prediction)
+    print('--------------------------- \n')
+
+    real_data['predicted-price'] = prediction
+    real_data['original-price'] = listing_price
+
+    print('--------------------------- \n')
+    print('REAL DATA \n', real_data)
+    print('--------------------------- \n')
 
 
 if __name__ == '__main__':
     cars_data_set = get_data_set()
     ref_cars = refactor_data_set(cars_data_set)
     # clean_data(_cars)
-    print(ref_cars)
+    is_certain_make = ref_cars['mark'] == 'renault'
+    is_certain_model = ref_cars['model'] == 'clio'
 
-    model_created, cars = create_train_model(ref_cars)
+    filtered_cars = ref_cars[(is_certain_make & is_certain_model)]
+
+    # model_created, cars = create_train_model(ref_cars)
+    model_created, cars = create_train_model(filtered_cars[1:20])
+
     # prediction using CatBoostRegressor
-    # regressor_catboost(cars, model_created)
+    regressor_catboost(cars, model_created)
 
     # using predict from CatBoost
-    # predict_price(model_created, cars)
+    predict_price(model_created, cars)
 
-    # bar_chart(model_created, cars)
+    bar_chart(model_created, cars)
 
 
 
