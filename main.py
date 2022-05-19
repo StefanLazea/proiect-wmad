@@ -18,6 +18,7 @@ def refactor_data_set(_cars):
     _cars = _cars.drop('fuel', axis=1)
     # zlot to euro conversion
     _cars['price'] = _cars["price"] * 0.22
+    # cars = cars.drop('price', axis=1)
     # cars = cars.drop('mark', axis=1)
     # cars = cars.drop('model', axis=1)
     _cars = _cars.drop('generation_name', axis=1)
@@ -25,9 +26,9 @@ def refactor_data_set(_cars):
 
 
 # get variables that are used for training
-def train_variables(cars):
-    x = cars.drop('price', axis=1)
-    y = cars.price
+def train_variables(_cars):
+    x = _cars.drop('price', axis=1)
+    y = _cars.price
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, train_size=0.7, test_size=0.3, random_state=100)
     return x_train, x_test, y_train, y_test, x, y
@@ -100,8 +101,8 @@ if __name__ == '__main__':
 
     filtered_cars = ref_cars[(is_certain_make & is_certain_model)]
 
-    # model_created, cars = create_train_model(ref_cars)
-    model_created, cars = create_train_model(filtered_cars[1:20])
+    model_created, cars = create_train_model(ref_cars)
+    # model_created, cars = create_train_model(filtered_cars[1:20])
 
     # prediction using CatBoostRegressor
     regressor_catboost(cars, model_created)
