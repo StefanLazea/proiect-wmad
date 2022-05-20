@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from catboost import CatBoostRegressor
 from sklearn.model_selection import train_test_split
 
+# predictia preturilor masinilor second hand din Polonia
+# todo: price prediction for my car
+# todo: integrate with web-scrapper or an API
+# todo: move to parts -> to estimate parts costs (disertatie)
+
 
 def get_data_set():
     _cars = pd.read_csv('./Car_Prices_Poland_Kaggle.csv')
@@ -46,8 +51,8 @@ def regressor_catboost(_cars, model):
 
 
 def create_train_model(_cars):
-    make_dummies = pd.get_dummies(_cars.mark)
-    _cars = _cars.join(make_dummies)
+    mark_dummies = pd.get_dummies(_cars.mark)
+    _cars = _cars.join(mark_dummies)
     _cars = _cars.drop('mark', axis=1)
     model_dummies = pd.get_dummies(_cars.model)
     _cars = _cars.join(model_dummies)

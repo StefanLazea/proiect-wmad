@@ -1,4 +1,3 @@
-# https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=renault+r12&_sacat=0
 import json
 
 from bs4 import BeautifulSoup as bs
@@ -19,16 +18,17 @@ def get_data(urls):
         price_parent = soup.find('div', {'class': 'mainPrice'})
         text_price = price_parent.find('span', {'class': 'notranslate'}).text
         price = float(text_price.split('EUR')[1].strip())
-        print(text_price.split())
+        # print(text_price.split())
         currency = text_price.split()[0]
 
         shipping_cost_parent = soup.find('div', {'class': 'ux-labels-values col-12 ux-labels-values--shipping'})
         shipping_cost = shipping_cost_parent.find('span', {'class': 'ux-textspans ux-textspans--BOLD'}).text
-        print(shipping_cost.split('EUR'))
+        # print(shipping_cost.split('EUR'))
         if shipping_cost == 'FREE':
             shipping_cost = 0
         else:
             shipping_cost = float(shipping_cost.split('EUR')[1].strip())
+
         print(f'Obiectul: {title} are un pret de: {price} {currency}, iar transportul: {shipping_cost} {currency} \n')
         information = {
             "price": price,
@@ -42,7 +42,6 @@ def get_data(urls):
 
 def write_json(data_array, filename="sample.json"):
     json_string = json.dumps(data_array)
-    print(json_string)
 
     with open(filename, "w") as outfile:
         outfile.write(json_string)
@@ -54,7 +53,8 @@ def main():
             'https://www.ebay.com/itm/170751082764?epid=1158289445&hash=item27c18ec10c:g:frIAAOSwTm1dZj7Y',
             'https://www.ebay.com/itm/154787458344?hash=item240a0d2d28:g:hdcAAOSwyG5h2oSp',
             'https://www.ebay.com/itm/363832730644?hash=item54b61ee414:g:-ZAAAOSw3xFieRc2',
-            'https://www.ebay.com/itm/353958257450?hash=item52698e632a:g:B68AAOSwA-NhYzWW'
+            'https://www.ebay.com/itm/353958257450?hash=item52698e632a:g:B68AAOSwA-NhYzWW',
+            # 'https://www.ebay.com/itm/294985798533?hash=item44ae861385:g:zfkAAOSwfnhigqH3'
             ]
     data_array = get_data(urls)
     write_json(data_array)
